@@ -91,7 +91,7 @@ The following quantum-safe digital signature algorithms from liboqs are supporte
 
 - `oqs_sig_default` (see [here](https://github.com/open-quantum-safe/boringssl/wiki/Using-liboqs-algorithms-not-in-the-fork#oqsdefault) for what this denotes)
 <!--- OQS_TEMPLATE_FRAGMENT_LIST_SIGS_START -->
-- **CRYSTALS-DILITHIUM**: `dilithium2`, `dilithium3`, `dilithium4`
+- **CRYSTALS-DILITHIUM**: `dilithium2`, `dilithium3`, `dilithium5`, `dilithium2_aes`, `dilithium3_aes`, `dilithium5_aes`
 - **Falcon**: `falcon512`, `falcon1024`
 - **Picnic**: `picnicl1fs`, `picnicl1ur`, `picnicl1full`, `picnic3l1`, `picnic3l3`, `picnic3l5`
 - **Rainbow**: `rainbowIclassic`, `rainbowIcircumzenithal`, `rainbowIcompressed`, `rainbowIIIclassic`, `rainbowIIIcircumzenithal`, `rainbowIIIcompressed`, `rainbowVclassic`, `rainbowVcircumzenithal`, `rainbowVcompressed`
@@ -192,7 +192,7 @@ Contributors to this fork include:
 
 ## Acknowledgments
 
-Financial support for the development of Open Quantum Safe has been provided by Amazon Web Services and the Tutte Institute for Mathematics and Computing.
+Financial support for the development of Open Quantum Safe has been provided by Amazon Web Services and the Canadian Centre for Cyber Security.
 We'd like to make a special acknowledgement to the companies who have dedicated programmer time to contribute source code to OQS, including Amazon Web Services, evolutionQ, Microsoft Research, Cisco Systems, and IBM Research.
 
 Research projects which developed specific components of OQS have been supported by various research grants, including funding from the Natural Sciences and Engineering Research Council of Canada (NSERC); see [here](https://openquantumsafe.org/papers/SAC-SteMos16.pdf) and [here](https://openquantumsafe.org/papers/NISTPQC-CroPaqSte19.pdf) for funding acknowledgments.
