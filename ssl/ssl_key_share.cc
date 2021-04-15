@@ -33,6 +33,7 @@
 #include "../crypto/internal.h"
 
 #include <oqs/oqs.h>
+#include <iostream>
 
 BSSL_NAMESPACE_BEGIN
 
@@ -313,6 +314,10 @@ class OQSKeyShare : public SSLKeyShare {
   // the error in there as opposed to in this constructor.
   OQSKeyShare(uint16_t group_id, const char *oqs_meth) : group_id_(group_id) {
     kex_alg_ = OQS_KEM_new(oqs_meth);
+    std::cout << "ALLOCATING.\n";
+    if(!kex_alg_) {
+        std::cout << "ALLOCATION FAILURE.\n";
+    }
   }
 
   uint16_t GroupID() const override { return group_id_; }
