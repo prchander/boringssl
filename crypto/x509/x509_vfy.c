@@ -183,6 +183,7 @@ static X509 *lookup_cert_match(X509_STORE_CTX *ctx, X509 *x)
 
 int X509_verify_cert(X509_STORE_CTX *ctx)
 {
+    printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! WE ARE INSIDE BORINGSSL VERIFY FUNCTION !!!");
     X509 *x, *xtmp, *xtmp2, *chain_ss = NULL;
     int bad_chain = 0;
     X509_VERIFY_PARAM *param = ctx->param;
@@ -193,6 +194,7 @@ int X509_verify_cert(X509_STORE_CTX *ctx)
     if (ctx->cert == NULL) {
         OPENSSL_PUT_ERROR(X509, X509_R_NO_CERT_SET_FOR_US_TO_VERIFY);
         ctx->error = X509_V_ERR_INVALID_CALL;
+        printf("!!! RETURN VALUE ERRORED: X509_R_NO_CERT_SET_FOR_US_TO_VERIFY = %d !!!", -1);
         return -1;
     }
     if (ctx->chain != NULL) {
@@ -202,6 +204,7 @@ int X509_verify_cert(X509_STORE_CTX *ctx)
          */
         OPENSSL_PUT_ERROR(X509, ERR_R_SHOULD_NOT_HAVE_BEEN_CALLED);
         ctx->error = X509_V_ERR_INVALID_CALL;
+        printf("!!! RETURN VALUE ERRORED: ERR_R_SHOULD_NOT_HAVE_BEEN_CALLED = %d !!!", -1);
         return -1;
     }
 
@@ -220,12 +223,17 @@ int X509_verify_cert(X509_STORE_CTX *ctx)
     X509_up_ref(ctx->cert);
     ctx->last_untrusted = 1;
 
+
+    printf("!!! VERIFIED THAT CHAIN IS PRESENT :) !!!");
+
     /* We use a temporary STACK so we can chop and hack at it.
      * sktmp = ctx->untrusted ++ ctx->ctx->additional_untrusted */
     if (ctx->untrusted != NULL
         && (sktmp = sk_X509_dup(ctx->untrusted)) == NULL) {
         OPENSSL_PUT_ERROR(X509, ERR_R_MALLOC_FAILURE);
         ctx->error = X509_V_ERR_OUT_OF_MEM;
+
+        printf("!!! ERROR X509_V_ERR_OUT_OF_MEM !!!");
         goto end;
     }
 
@@ -235,6 +243,7 @@ int X509_verify_cert(X509_STORE_CTX *ctx)
             if (sktmp == NULL) {
                 OPENSSL_PUT_ERROR(X509, ERR_R_MALLOC_FAILURE);
                 ctx->error = X509_V_ERR_OUT_OF_MEM;
+                printf("!!! ERROR X509_V_ERR_OUT_OF_MEM !!!");
                 goto end;
             }
         }
@@ -246,10 +255,14 @@ int X509_verify_cert(X509_STORE_CTX *ctx)
                               k))) {
                 OPENSSL_PUT_ERROR(X509, ERR_R_MALLOC_FAILURE);
                 ctx->error = X509_V_ERR_OUT_OF_MEM;
+                printf("!!! ERROR X509_V_ERR_OUT_OF_MEM !!!");
                 goto end;
             }
         }
     }
+
+
+    printf("!!! STARTING THE CHAIN VERIFICATION !!!");
 
     num = sk_X509_num(ctx->chain);
     x = sk_X509_value(ctx->chain, num - 1);
@@ -257,15 +270,19 @@ int X509_verify_cert(X509_STORE_CTX *ctx)
 
     for (;;) {
         /* If we have enough, we break */
-        if (depth < num)
+        if (depth < num) {
+            printf("!!! BORINGSSL BUG DETECTED !!!");
             break;              /* FIXME: If this happens, we should take
                                  * note of it and, if appropriate, use the
                                  * X509_V_ERR_CERT_CHAIN_TOO_LONG error code
                                  * later. */
+        }
 
         /* If we are self signed, we break */
-        if (cert_self_signed(x))
+        if (cert_self_signed(x)) {
+            printf("!!! Self signed, break verification !!!");
             break;
+        }
         /*
          * If asked see if we can find issuer in trusted store first
          */
@@ -273,12 +290,14 @@ int X509_verify_cert(X509_STORE_CTX *ctx)
             ok = ctx->get_issuer(&xtmp, ctx, x);
             if (ok < 0) {
                 ctx->error = X509_V_ERR_STORE_LOOKUP;
+                printf("!!! Asked to see if we can find issuer in trusted store first !!!");
                 goto end;
             }
             /*
              * If successful for now free up cert so it will be picked up
              * again later.
              */
+            printf("!!! It was successful! Now free up cert so it can be picked up again later !!!");
             if (ok > 0) {
                 X509_free(xtmp);
                 break;
@@ -293,6 +312,7 @@ int X509_verify_cert(X509_STORE_CTX *ctx)
                     OPENSSL_PUT_ERROR(X509, ERR_R_MALLOC_FAILURE);
                     ctx->error = X509_V_ERR_OUT_OF_MEM;
                     ok = 0;
+                    printf("!!! Allocation ERROR !!!");
                     goto end;
                 }
                 X509_up_ref(xtmp);
@@ -303,6 +323,7 @@ int X509_verify_cert(X509_STORE_CTX *ctx)
                 /*
                  * reparse the full chain for the next one
                  */
+                printf("!!! FINISHED LOOP, reparsing full chain for next loop... !!!");
                 continue;
             }
         }
@@ -311,6 +332,7 @@ int X509_verify_cert(X509_STORE_CTX *ctx)
 
     /* Remember how many untrusted certs we have */
     j = num;
+    printf("!!! THERE ARE %d UNTRUSTED CERTS !!!", j);
     /*
      * at this point, chain should contain a list of untrusted certificates.
      * We now need to add at least one trusted one, if possible, otherwise we
@@ -324,6 +346,7 @@ int X509_verify_cert(X509_STORE_CTX *ctx)
         i = sk_X509_num(ctx->chain);
         x = sk_X509_value(ctx->chain, i - 1);
         if (cert_self_signed(x)) {
+            printf("!!! We have a self signed certificate !!!");
             /* we have a self signed certificate */
             if (sk_X509_num(ctx->chain) == 1) {
                 /*
@@ -331,6 +354,7 @@ int X509_verify_cert(X509_STORE_CTX *ctx)
                  * find it in the store. We must have an exact match to avoid
                  * possible impersonation.
                  */
+                printf("!!! A single self signed certificate, checking store... !!!");
                 ok = ctx->get_issuer(&xtmp, ctx, x);
                 if ((ok <= 0) || X509_cmp(x, xtmp)) {
                     ctx->error = X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT;
@@ -340,13 +364,17 @@ int X509_verify_cert(X509_STORE_CTX *ctx)
                         X509_free(xtmp);
                     bad_chain = 1;
                     ok = cb(0, ctx);
-                    if (!ok)
+                    if (!ok) {
+                        printf("!!! BORINGSSL bad_chain !!!");
                         goto end;
+                    }
+                    printf("!!! Not in store, but also not a bad chain? Success? ... !!!");
                 } else {
                     /*
                      * We have a match: replace certificate with store
                      * version so we get any trust settings.
                      */
+                    printf("!!! ITS IN THE STORE, replace certificate with store version so we get any trust settings... !!!");
                     X509_free(x);
                     x = xtmp;
                     (void)sk_X509_set(ctx->chain, i - 1, x);
@@ -363,38 +391,50 @@ int X509_verify_cert(X509_STORE_CTX *ctx)
                 x = sk_X509_value(ctx->chain, num - 1);
             }
         }
+        printf("!!! We now lookup certs from the certificate store !!!");
         /* We now lookup certs from the certificate store */
         for (;;) {
             /* If we have enough, we break */
-            if (depth < num)
+            if (depth < num) {
+                printf("!!! Depth of %d is less than %d, so we can break !!!", depth, num);
                 break;
+            }
             /* If we are self signed, we break */
-            if (cert_self_signed(x))
+            if (cert_self_signed(x)) {
+                printf("!!! It is self signed !!!");
                 break;
+            }
             ok = ctx->get_issuer(&xtmp, ctx, x);
 
             if (ok < 0) {
                 ctx->error = X509_V_ERR_STORE_LOOKUP;
+                printf("!!! ERROR: X509 Store lookup !!!");
                 goto end;
             }
-            if (ok == 0)
+            if (ok == 0) {
+                printf("!!! OK is 0, so just break? No comments provided, probably success !!!");
                 break;
+            }
             x = xtmp;
             if (!sk_X509_push(ctx->chain, x)) {
                 X509_free(xtmp);
                 OPENSSL_PUT_ERROR(X509, ERR_R_MALLOC_FAILURE);
                 ctx->error = X509_V_ERR_OUT_OF_MEM;
                 ok = 0;
+                printf("!!! went far through loop line 406, X509_V_ERR_OUT_OF_MEM !!!");
                 goto end;
             }
             num++;
         }
 
         /* we now have our chain, lets check it... */
+        printf("!!! We not have our chain, let's check it !!!");
         trust = check_trust(ctx);
 
         /* If explicitly rejected error */
         if (trust == X509_TRUST_REJECTED) {
+
+            printf("!!! UH OH, CHAIN TRUST REJECTED !!!");
             ok = 0;
             goto end;
         }
@@ -411,10 +451,13 @@ int X509_verify_cert(X509_STORE_CTX *ctx)
             while (j-- > 1) {
                 xtmp2 = sk_X509_value(ctx->chain, j - 1);
                 ok = ctx->get_issuer(&xtmp, ctx, xtmp2);
-                if (ok < 0)
+                if (ok < 0) {
+                    printf("!!! Trying to get issuer, but it ERRORED !!!");
                     goto end;
+                }
                 /* Check if we found an alternate chain */
                 if (ok > 0) {
+                    printf("!!! We have found an alternate chain !!!");
                     /*
                      * Free up the found cert we'll add it again later
                      */
@@ -431,10 +474,12 @@ int X509_verify_cert(X509_STORE_CTX *ctx)
                     }
                     ctx->last_untrusted = sk_X509_num(ctx->chain);
                     retry = 1;
+                    printf("!!! The alternate chain was dumped !!!");
                     break;
                 }
             }
         }
+        printf("!!! Will it retry? = %d !!!", retry);
     } while (retry);
 
     /*
@@ -442,14 +487,21 @@ int X509_verify_cert(X509_STORE_CTX *ctx)
      * self signed certificate in which case we've indicated an error already
      * and set bad_chain == 1
      */
+
     if (trust != X509_TRUST_TRUSTED && !bad_chain) {
+        printf("!!! It is not explicitly trusted then indicate error unless it's a single self signed certificate in which case we've indicated an error already and set bad_chain == 1 !!!");
         if ((chain_ss == NULL) || !ctx->check_issued(ctx, x, chain_ss)) {
-            if (ctx->last_untrusted >= num)
+            printf("!!! Chain is not issued !!!");
+            if (ctx->last_untrusted >= num) {
+                printf("!!! X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY !!!");
                 ctx->error = X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY;
-            else
+            } else {
+                printf("!!! X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT !!!");
                 ctx->error = X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT;
+            }
             ctx->current_cert = x;
         } else {
+            printf("!!! Chain is issued X509_V_ERR_SELF_SIGNED_CERT_IN_CHAIN !!!");
 
             sk_X509_push(ctx->chain, chain_ss);
             num++;
@@ -462,13 +514,16 @@ int X509_verify_cert(X509_STORE_CTX *ctx)
         ctx->error_depth = num - 1;
         bad_chain = 1;
         ok = cb(0, ctx);
-        if (!ok)
+        if (!ok) { // Cybersecurity Lab 5/04/21: THIS IS WHERE IT ERRORS!!!!!!!!!!!!!
+            printf("!!! ITS a BAD CHAIN! error_depth = %d, ok = %d !!!", num - 1, ok);
             goto end;
+        }
     }
 
     /* We have the chain complete: now we need to check its purpose */
     ok = check_chain_extensions(ctx);
 
+    printf("!!! CALLING CHAIN COMPLETE !!!");
     if (!ok)
         goto end;
 
@@ -482,6 +537,7 @@ int X509_verify_cert(X509_STORE_CTX *ctx)
      * they may be needed for CRL signature verification.
      */
 
+    printf("!!! CALLING CHECKING REVOCATION STATUS !!!");
     ok = ctx->check_revocation(ctx);
     if (!ok)
         goto end;
@@ -489,6 +545,7 @@ int X509_verify_cert(X509_STORE_CTX *ctx)
     int err = X509_chain_check_suiteb(&ctx->error_depth, NULL, ctx->chain,
                                       ctx->param->flags);
     if (err != X509_V_OK) {
+        printf("!!! CALLING X509_V_OK !!!");
         ctx->error = err;
         ctx->current_cert = sk_X509_value(ctx->chain, ctx->error_depth);
         ok = cb(0, ctx);
@@ -497,20 +554,26 @@ int X509_verify_cert(X509_STORE_CTX *ctx)
     }
 
     /* At this point, we have a chain and need to verify it */
-    if (ctx->verify != NULL)
+    if (ctx->verify != NULL) {
+        printf("!!! CALLING VERIFY !!!");
         ok = ctx->verify(ctx);
-    else
+    } else {
+        printf("!!! CALLING INTERNALVERIFY !!!");
         ok = internal_verify(ctx);
+    }
     if (!ok)
         goto end;
 
     /* Check name constraints */
 
+    printf("!!! GOT KIND OF FAR, VERIFYING NAME CONSTRAINTS !!!");
     ok = check_name_constraints(ctx);
     if (!ok)
         goto end;
 
     /* If we get this far evaluate policies */
+
+    printf("!!! GOT FAR, VERIFYING FINAL POLICIES !!!");
     if (!bad_chain && (ctx->param->flags & X509_V_FLAG_POLICY_CHECK))
         ok = ctx->check_policy(ctx);
 
@@ -523,8 +586,11 @@ int X509_verify_cert(X509_STORE_CTX *ctx)
     /* Safety net, error returns must set ctx->error */
     if (ok <= 0 && ctx->error == X509_V_OK)
         ctx->error = X509_V_ERR_UNSPECIFIED;
+
+    printf("!!! RETURN VALUE = %d !!!", ok);
     return ok;
 }
+
 
 /*
  * Given a STACK_OF(X509) find the issuer of cert (if any)
