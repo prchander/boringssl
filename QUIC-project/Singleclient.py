@@ -17,7 +17,7 @@ print(f'Client IP: {client_ip}')
 print(f'Number of samples: ', n)
 serverIP = input('Please enter the server IP: ')
 
-myCmd=f'{bssl_dir} client -connect 10.0.0.157:44330 -root-certs {cert_dir}'
+myCmd=f'{bssl_dir} client -connect {serverIP}:44330 -root-certs {cert_dir}'
 
 
 while n>0:
