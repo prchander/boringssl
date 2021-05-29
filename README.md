@@ -121,7 +121,7 @@ You will also need the latest version of the toolchain for the Go programming la
 Then, get the source code for this fork (`<BORINGSSL_DIR>` is a directory of your choosing):
 
 ```
-git clone --branch main https://github.com/open-quantum-safe/boringssl.git <BORINGSSL_DIR>
+git clone --branch master https://github.com/open-quantum-safe/boringssl.git <BORINGSSL_DIR>
 ```
 
 #### Step 1: Build and install liboqs
@@ -129,7 +129,7 @@ git clone --branch main https://github.com/open-quantum-safe/boringssl.git <BORI
 The following instructions will download and build liboqs, then install it to `<BORINGSSL_DIR>/oqs`.
 
 ```
-git clone --branch 0.4.0 --single-branch --depth 1 https://github.com/open-quantum-safe/liboqs.git
+git clone --branch main --single-branch --depth 1 https://github.com/open-quantum-safe/liboqs.git
 cd liboqs
 mkdir build && cd build
 cmake -G"Ninja" -DCMAKE_INSTALL_PREFIX=<BORINGSSL_DIR>/oqs -DOQS_USE_OPENSSL=OFF ..
