@@ -183,8 +183,10 @@ def get_interfaces():
 		print()
 	return interface
 
-lsquic_dir = os.path.expanduser('~/oqs/lsquic')
-cert = os.path.expanduser('~/oqs/lsquic/certs')
+bssl_dir = os.path.expanduser('~/oqs/boringssl/build/tool/bssl')
+
+#lsquic_dir = os.path.expanduser('~/oqs/lsquic')
+#cert = os.path.expanduser('~/oqs/lsquic/certs')
 
 client_ip = getIP()
 print(f'Client IP: {client_ip}')
@@ -210,10 +212,12 @@ try:
 	os.remove('0rttTest.txt')
 except: pass
 
-if zeroRoundTrip:
-	myCmd= f'{lsquic_dir}/build/bin/./http_client -0 0rttTest.txt -H www.example.com -s {serverIP}:4433 -p /'
-else:
-	myCmd= f'{lsquic_dir}/build/bin/./http_client -H www.example.com -s {serverIP}:4433 -p /'
+#if zeroRoundTrip:
+#	myCmd= f'{lsquic_dir}/build/bin/./http_client -0 0rttTest.txt -H www.example.com -s {serverIP}:4433 -p /'
+#else:
+#	myCmd= f'{lsquic_dir}/build/bin/./http_client -H www.example.com -s {serverIP}:4433 -p /'
+#cert_dir = os.path.expanduser(f'~/oqs/boringssl/QUIC-project/{algorithm}/key_CA.pem')
+#myCmd=f'{bssl_dir} client -connect {serverIP}:44330 -root-certs {cert_dir}'
 
 startCPUlogger()
 
@@ -231,11 +235,13 @@ while not closingApplication:
 			startTcpdump(interface, algorithm, zeroRoundTrip)
 			time.sleep(1)
 
-			if zeroRoundTrip:
-				myCmd= f'{lsquic_dir}/build/bin/./http_client -0 0rttTest.txt -C {cert}/{algorithm}/key_CA.pem -H www.example.com -s {serverIP}:4433 -p /'
-			else:
-				myCmd= f'{lsquic_dir}/build/bin/./http_client -C {cert}/{algorithm}/key_CA.pem -H www.example.com -s {serverIP}:4433 -p /'
-			
+			#if zeroRoundTrip:
+			#	myCmd= f'{lsquic_dir}/build/bin/./http_client -0 0rttTest.txt -C {cert}/{algorithm}/key_CA.pem -H www.example.com -s {serverIP}:4433 -p /'
+			#else:
+			#	myCmd= f'{lsquic_dir}/build/bin/./http_client -C {cert}/{algorithm}/key_CA.pem -H www.example.com -s {serverIP}:4433 -p /'
+			cert_dir = os.path.expanduser(f'~/oqs/boringssl/QUIC-project/{algorithm}/key_CA.pem')
+			myCmd=f'{bssl_dir} client -connect {serverIP}:44330 -root-certs {cert_dir}'
+
 			print('Starting...')
 
 			clearFilters()

@@ -8,6 +8,7 @@ def getIP():
 
 bssl_dir = os.path.expanduser('~/oqs/boringssl/build/tool/bssl')
 cert_dir = os.path.expanduser('~/oqs/boringssl/QUIC-project/rsa/key_CA.pem')
+#cert_dir = os.path.expanduser('~/oqs/boringssl/QUIC-project/broken_rsa/key_CA.pem')
 
 print(f'Certificate Directory: {cert_dir}')
 n = 1
