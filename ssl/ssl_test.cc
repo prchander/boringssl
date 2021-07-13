@@ -3633,7 +3633,7 @@ TEST(SSLTest, BuffersFailWithoutCustomVerify) {
                                         chain.size(), key.get(), nullptr));
 
   // Without SSL_CTX_set_custom_verify(), i.e. with everything in the default
-  // configuration, certificate verification should fail.
+  // configuration, certificate verification should fail. // Cybersecurity Lab : Custom verify guarentees a successful connection
   bssl::UniquePtr<SSL> client, server;
   ASSERT_FALSE(ConnectClientAndServer(&client, &server, client_ctx.get(),
                                       server_ctx.get()));

@@ -183,6 +183,9 @@ def get_interfaces():
 		print()
 	return interface
 
+def sendCommandsToTerminateClient():
+    os.system("bash -c \"sleep 0.1 ; xte 'str AAAAAAAAAA' 'key Return' 'keydown Control_L' 'key C' 'keyup Control_L'\" &")
+
 bssl_dir = os.path.expanduser('~/oqs/boringssl/build/tool/bssl')
 
 #lsquic_dir = os.path.expanduser('~/oqs/lsquic')
@@ -260,6 +263,8 @@ while not closingApplication:
 					applyFilters(droprate)
 
 					os.system(myCmd)
+					sendCommandsToTerminateClient()
+					
 					samples -=1
 				print('Waiting 3 minutes before starting next droprate test...')
 				time.sleep(120)
