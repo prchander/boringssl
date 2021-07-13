@@ -145,7 +145,7 @@ def stopServerSSH(serverIP):
 def restartServerSSH(algorithm, serverIP):
 	stopServerSSH(serverIP)
 	print('Starting server...')
-	output = call_ssh(f'python3 ~/oqs/lsquic/certs/experiment_droprate_client.py {algorithm} </dev/null &>/dev/null &')
+	output = call_ssh(f'python3 ~/oqs/boringssl/QUIC-project/experiment_droprate_server.py {algorithm} </dev/null &>/dev/null &')
 	print()
 	print('Server started! Waiting 5 seconds to be certain...')
 	time.sleep(5)
@@ -183,9 +183,6 @@ def get_interfaces():
 		print()
 	return interface
 
-def sendCommandsToTerminateClient():
-    os.system("bash -c \"sleep 0.1 ; xte 'str AAAAAAAAAA' 'key Return' 'keydown Control_L' 'key C' 'keyup Control_L'\" &")
-
 bssl_dir = os.path.expanduser('~/oqs/boringssl/build/tool/bssl')
 
 #lsquic_dir = os.path.expanduser('~/oqs/lsquic')
@@ -210,6 +207,8 @@ ssh_obj = paramiko.SSHClient()
 ssh_obj.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 ssh_obj.connect(serverIP, ssh_port, ssh_username, ssh_password)
 
+def sendCommandsToTerminateClient():
+    call_ssh("bash -c \"sleep 0.1 ; xte 'str AAAAAAAAAA' 'key Return' 'keydown Control_L' 'key C' 'keyup Control_L'\" &")
 
 try:
 	os.remove('0rttTest.txt')
@@ -264,7 +263,7 @@ while not closingApplication:
 
 					os.system(myCmd)
 					sendCommandsToTerminateClient()
-					
+
 					samples -=1
 				print('Waiting 3 minutes before starting next droprate test...')
 				time.sleep(120)
