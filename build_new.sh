@@ -18,6 +18,7 @@ fi
 echo -n "Build BORINGSSL? (y/n)? "
 read answer
 if [ "$answer" != "${answer#[Yy]}" ] ;then
+	sudo apt install -y cmake gcc ninja-build libunwind-dev pkg-config python3 python3-psutil
 	cd $BORINGSSL_DIR
 	rm -rf build
 	mkdir build && cd build
