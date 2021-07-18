@@ -4,6 +4,7 @@ BORINGSSL_DIR=$PWD/boringssl
 echo -n "Build LIBOQS? (y/n)? "
 read answer
 if [ "$answer" != "${answer#[Yy]}" ] ;then
+	sudo apt install -y astyle cmake gcc ninja-build libssl-dev python3-pytest python3-pytest-xdist unzip xsltproc doxygen graphviz
 	cd ~/oqs/liboqs
 	rm -rf build
 	mkdir build && cd build
