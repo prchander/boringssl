@@ -130,7 +130,7 @@ def startCPUlogger():
 
 
 def getServerProcessID(serverIP):
-	output = call_ssh('ps -A | grep http_server')
+	output = call_ssh('ps -A | grep bssl')
 	output = output.strip().split(' ')
 	if len(output) == 0 or output[0] == '': return None
 	pid = int(output[0])
@@ -140,7 +140,7 @@ def stopServerSSH(serverIP):
 	pid = getServerProcessID(serverIP)
 	if pid != None:
 		print('Stopping server...')
-		call_ssh(f'sudo pkill -f http_server')
+		call_ssh(f'sudo pkill -f bssl')
 
 def restartServerSSH(algorithm, serverIP):
 	stopServerSSH(serverIP)
