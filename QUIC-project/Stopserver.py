@@ -6,7 +6,7 @@ def terminal(cmd):
 	return os.popen(cmd).read()
 
 def getServerProcessID():
-	output = terminal('ps -A | grep http_server')
+	output = terminal('ps -A | grep bssl')
 	output = output.strip().split(' ')
 	if len(output) == 0 or output[0] == '': return None
 	pid = int(output[0])

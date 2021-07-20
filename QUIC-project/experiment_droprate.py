@@ -10,7 +10,6 @@ from getpass import getpass
 
 # sudo apt-get install python3-paramiko
 
-
 global ssh_obj
 global closingApplication
 
@@ -100,7 +99,6 @@ def on_close():
 
 atexit.register(on_close) # Make on_close() run when the script terminates
 
-
 def getTcpdumpProcessID():
 	output = terminal('ps -A | grep tcpdump')
 	output = output.strip().split(' ')
@@ -113,14 +111,12 @@ def stopTcpdump():
 	if pid != None:
 		print('Stopping TCPDUMP...')
 		call_ssh(f'sudo pkill -f tcpdump')
-	
 
 def startTcpdump(interface, algorithm, zeroRoundTrip):
 	stopTcpdump()
 	myCmd = f'python3 experiment_run_tcpdump.py {interface} {algorithm} {zeroRoundTrip} {numSamples}'
 	print(myCmd)
 	create_task('tcpdump', terminal, myCmd)
-
 
 def startCPUlogger():
 	print('Starting CPU logger...')
@@ -185,9 +181,6 @@ def get_interfaces():
 
 bssl_dir = os.path.expanduser('~/oqs/boringssl/build/tool/bssl')
 
-#lsquic_dir = os.path.expanduser('~/oqs/lsquic')
-#cert = os.path.expanduser('~/oqs/lsquic/certs')
-
 client_ip = getIP()
 print(f'Client IP: {client_ip}')
 serverIP = input('Please enter the server IP: ')
@@ -208,18 +201,8 @@ ssh_obj.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 ssh_obj.connect(serverIP, ssh_port, ssh_username, ssh_password)
 
 def sendCommandsToTerminateClient():
-    call_ssh("bash -c \"sleep 0.1 ; xte 'str AAAAAAAAAA' 'key Return' 'keydown Control_L' 'key C' 'keyup Control_L'\" &")
-
-try:
-	os.remove('0rttTest.txt')
-except: pass
-
-#if zeroRoundTrip:
-#	myCmd= f'{lsquic_dir}/build/bin/./http_client -0 0rttTest.txt -H www.example.com -s {serverIP}:4433 -p /'
-#else:
-#	myCmd= f'{lsquic_dir}/build/bin/./http_client -H www.example.com -s {serverIP}:4433 -p /'
-#cert_dir = os.path.expanduser(f'~/oqs/boringssl/QUIC-project/{algorithm}/key_CA.pem')
-#myCmd=f'{bssl_dir} client -connect {serverIP}:44330 -root-certs {cert_dir}'
+	# Use xte to control user input sent to the server
+    terminal("bash -c \"sleep 0.1 ; xte 'str AAAAAAAAAA' 'key Return' 'keydown Control_L' 'key C' 'keyup Control_L'\" &")
 
 startCPUlogger()
 
@@ -237,10 +220,6 @@ while not closingApplication:
 			startTcpdump(interface, algorithm, zeroRoundTrip)
 			time.sleep(1)
 
-			#if zeroRoundTrip:
-			#	myCmd= f'{lsquic_dir}/build/bin/./http_client -0 0rttTest.txt -C {cert}/{algorithm}/key_CA.pem -H www.example.com -s {serverIP}:4433 -p /'
-			#else:
-			#	myCmd= f'{lsquic_dir}/build/bin/./http_client -C {cert}/{algorithm}/key_CA.pem -H www.example.com -s {serverIP}:4433 -p /'
 			cert_dir = os.path.expanduser(f'~/oqs/boringssl/QUIC-project/{algorithm}/key_CA.pem')
 			myCmd=f'{bssl_dir} client -connect {serverIP}:44330 -root-certs {cert_dir}'
 
