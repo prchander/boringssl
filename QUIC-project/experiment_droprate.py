@@ -18,6 +18,7 @@ numSamples = 100
 zeroRoundTrip = False
 droprates = [0, 10, 40]
 
+print()
 print('Number of samples', numSamples)
 
 if not os.path.exists('fullyAutomatedLogs'):
@@ -25,8 +26,14 @@ if not os.path.exists('fullyAutomatedLogs'):
 
 # Send a command to the linux terminal
 def terminal(cmd):
-	#print(cmd)
 	return os.popen(cmd).read()
+
+# Send a command to the linux terminal
+def resilient_terminal(cmd):
+	try:
+		return os.popen(cmd).read()
+	except KeyboardInterrupt():
+		pass
 
 def call_ssh(cmd):
 	#print('Calling ', cmd)
@@ -117,13 +124,13 @@ def startTcpdump(interface, algorithm, zeroRoundTrip):
 	stopTcpdump()
 	myCmd = f'python3 experiment_run_tcpdump.py {interface} {algorithm} {zeroRoundTrip} {numSamples}'
 	print(myCmd)
-	create_task('tcpdump', terminal, myCmd)
+	create_task('tcpdump', resilient_terminal, myCmd)
 
 def startCPUlogger():
 	print('Starting CPU logger...')
 	myCmd = f'python3 experiment_log_cpu.py'
 	print(myCmd)
-	create_task('cpu logger', terminal, myCmd)
+	create_task('cpu logger', resilient_terminal, myCmd)
 
 
 def getServerProcessID(serverIP):
@@ -137,7 +144,8 @@ def stopServerSSH(serverIP):
 	pid = getServerProcessID(serverIP)
 	if pid != None:
 		print('Stopping server...')
-		call_ssh(f'sudo pkill -f bssl')
+		call_ssh(f'kill {pid}')
+		#call_ssh(f'sudo pkill -f bssl')
 
 def restartServerSSH(algorithm, serverIP):
 	stopServerSSH(serverIP)
@@ -181,6 +189,10 @@ def get_interfaces():
 	return interface
 
 bssl_dir = os.path.expanduser('~/oqs/boringssl/build/tool/bssl')
+
+print()
+print('PLEASE NOTE: To stop this application, trigger a core dump by using the sequence CTRL+[1 through 9].')
+print()
 
 client_ip = getIP()
 print(f'Client IP: {client_ip}')
@@ -236,19 +248,29 @@ while not closingApplication:
 				samples = numSamples
 				while samples > 0:
 
-					clearFilters()
-					networkDelimeter(serverIP)
-					applyFilters(droprate)
+					try:
+						clearFilters()
+						networkDelimeter(serverIP)
+						applyFilters(droprate)
 
-					# Connect
-					terminal(myCmd)
+						# Connect
+						print('Starting client')
 
-					# Use xte to control user input --> send message
-					terminal("bash -c \"xte 'str AAAAAAAA' 'key Return'\" &")
+						terminal(myCmd)
+						time.sleep(1)
 
-					# Disconnect
-					#terminal("bash -c \"sleep 0.1 ; xte 'keydown Control_L' 'key C' 'keyup Control_L'\" &")
-					terminal("bash -c \"xte 'keydown Control_L' 'key C' 'keyup Control_L'\" &")
+						# Use xte to control user input --> send message
+						#terminal("bash -c \"xte 'str AAAAAAAA' 'key Return'\" &")
+						#terminal("xte 'str AAAAAAAA' 'key Return'")
+						terminal("xte 'str AAAAAAAA' 'sleep 0.1' 'key Return' 'sleep 0.5' 'keydown Control_L' 'key C' 'keyup Control_L'")
+
+						# Disconnect
+						#print('Stopping client')
+						#terminal("xte 'keydown Control_L' 'key C' 'keyup Control_L'")
+
+					except KeyboardInterrupt:
+						terminal("xte 'keyup Control_L'")
+
 
 					samples -=1
 				print('Waiting 3 minutes before starting next droprate test...')
