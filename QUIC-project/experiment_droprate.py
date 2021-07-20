@@ -254,7 +254,7 @@ while not closingApplication:
 						applyFilters(droprate)
 
 						# Connect
-						print('Starting client')
+						#print('Starting client')
 
 						terminal(myCmd)
 						time.sleep(1)
@@ -267,6 +267,8 @@ while not closingApplication:
 						# Disconnect
 						#print('Stopping client')
 						#terminal("xte 'keydown Control_L' 'key C' 'keyup Control_L'")
+
+						time.sleep(6)
 
 					except KeyboardInterrupt:
 						terminal("xte 'keyup Control_L'")
