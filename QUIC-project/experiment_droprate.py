@@ -244,11 +244,9 @@ while not closingApplication:
 					terminal(myCmd)
 
 					# Use xte to control user input --> send message
-					print('a')
 					terminal("bash -c \"xte 'str AAAAAAAA' 'key Return'\" &")
 
 					# Disconnect
-					print('b')
 					#terminal("bash -c \"sleep 0.1 ; xte 'keydown Control_L' 'key C' 'keyup Control_L'\" &")
 					terminal("bash -c \"xte 'keydown Control_L' 'key C' 'keyup Control_L'\" &")
 
