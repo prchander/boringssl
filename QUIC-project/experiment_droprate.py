@@ -223,7 +223,8 @@ except: pass
 
 startCPUlogger()
 
-algorithms = ['rsa', 'dilithium2', 'dilithium3', 'dilithium5', 'falcon512', 'falcon1024'] #, 'rsa3072_dilithium2', 'rsa3072_dilithium3', 'rsa3072_falcon512', 'p256_dilithium2', 'p256_dilithium3', 'p256_dilithium4', 'p256_falcon512']
+#algorithms = ['rsa', 'dilithium2', 'dilithium3', 'dilithium5', 'falcon512', 'falcon1024'] #, 'rsa3072_dilithium2', 'rsa3072_dilithium3', 'rsa3072_falcon512', 'p256_dilithium2', 'p256_dilithium3', 'p256_dilithium4', 'p256_falcon512']
+algorithms = ['dilithium2', 'dilithium3', 'dilithium5', 'falcon512', 'falcon1024'] #, 'rsa3072_dilithium2', 'rsa3072_dilithium3', 'rsa3072_falcon512', 'p256_dilithium2', 'p256_dilithium3', 'p256_dilithium4', 'p256_falcon512']
 
 stopServerSSH(serverIP)
 stopTcpdump()
@@ -243,6 +244,9 @@ while not closingApplication:
 			#	myCmd= f'{lsquic_dir}/build/bin/./http_client -C {cert}/{algorithm}/key_CA.pem -H www.example.com -s {serverIP}:4433 -p /'
 			cert_dir = os.path.expanduser(f'~/oqs/boringssl/QUIC-project/{algorithm}/key_CA.pem')
 			myCmd=f'{bssl_dir} client -connect {serverIP}:44330 -root-certs {cert_dir}'
+
+			# Full command:
+			# ~/oqs/boringssl/build/tool/bssl client -connect 10.0.2.8:44330 -root-certs ~/oqs/boringssl/QUIC-project/rsa/key_CA.pem
 
 			print('Starting...')
 

@@ -46,7 +46,7 @@ key_srv_dir = f'~/oqs/boringssl/QUIC-project/{algorithm}/key_srv.pem'
 print(f'Key CRT Directory: {key_crt_dir}')
 print(f'Key SRV Directory: {key_srv_dir}')
 
-myCmd = f'{bssl_dir} server -cert {key_crt_dir} -key {key_srv_dir} -accept 44330'
+myCmd = f'{bssl_dir} server -loop -cert {key_crt_dir} -key {key_srv_dir} -accept 44330'
 #myCmd= f'{lsquic_dir}/build/bin/./http_server -c www.example.com,{lsquic_dir}/certs/{algorithm}/key_crt.pem,{lsquic_dir}/certs/{algorithm}/key_srv.pem -s {server_ip}:4433 -p /'
 
 os.system(myCmd)
