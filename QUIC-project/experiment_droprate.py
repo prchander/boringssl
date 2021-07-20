@@ -200,10 +200,6 @@ ssh_obj = paramiko.SSHClient()
 ssh_obj.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 ssh_obj.connect(serverIP, ssh_port, ssh_username, ssh_password)
 
-def sendCommandsToTerminateClient():
-	# Use xte to control user input sent to the server
-    terminal("bash -c \"sleep 0.1 ; xte 'str AAAAAAAAAA' 'key Return' 'keydown Control_L' 'key C' 'keyup Control_L'\" &")
-
 startCPUlogger()
 
 algorithms = ['rsa', 'dilithium2', 'dilithium3', 'dilithium5', 'falcon512', 'falcon1024'] #, 'rsa3072_dilithium2', 'rsa3072_dilithium3', 'rsa3072_falcon512', 'p256_dilithium2', 'p256_dilithium3', 'p256_dilithium4', 'p256_falcon512']
@@ -243,8 +239,15 @@ while not closingApplication:
 					networkDelimeter(serverIP)
 					applyFilters(droprate)
 
-					os.system(myCmd)
-					sendCommandsToTerminateClient()
+					# Connect
+					terminal(myCmd)
+
+					# Use xte to control user input --> send message
+    				terminal("bash -c \"xte 'str AAAAAAAA' 'key Return'\" &")
+
+					# Disconnect
+    				#terminal("bash -c \"sleep 0.1 ; xte 'keydown Control_L' 'key C' 'keyup Control_L'\" &")
+    				terminal("bash -c \"xte 'keydown Control_L' 'key C' 'keyup Control_L'\" &")
 
 					samples -=1
 				print('Waiting 3 minutes before starting next droprate test...')
