@@ -12,6 +12,7 @@ rm -rf oqs
 mkdir oqs && cd oqs
 
 git clone https://github.com/prchander/boringssl.git
+#git clone https://github.com/open-quantum-safe/boringssl.git
 
 
 BORINGSSL_DIR=$PWD/boringssl
@@ -19,6 +20,7 @@ BORINGSSL_DIR=$PWD/boringssl
 #Build liboqs
 #------------
 
+sudo apt install -y astyle cmake gcc ninja-build libssl-dev python3-pytest python3-pytest-xdist unzip xsltproc doxygen graphviz
 git clone https://github.com/open-quantum-safe/liboqs.git
 cd liboqs
 
@@ -33,6 +35,7 @@ sudo ninja install
 #Build OQS BoringSSL
 #-------------------
 
+sudo apt install -y cmake gcc ninja-build libunwind-dev pkg-config python3 python3-psutil
 cd $BORINGSSL_DIR
 rm -rf build
 mkdir build && cd build
