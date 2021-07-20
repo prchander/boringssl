@@ -243,11 +243,11 @@ while not closingApplication:
 					terminal(myCmd)
 
 					# Use xte to control user input --> send message
-    				terminal("bash -c \"xte 'str AAAAAAAA' 'key Return'\" &")
+					terminal("bash -c \"xte 'str AAAAAAAA' 'key Return'\" &")
 
 					# Disconnect
-    				#terminal("bash -c \"sleep 0.1 ; xte 'keydown Control_L' 'key C' 'keyup Control_L'\" &")
-    				terminal("bash -c \"xte 'keydown Control_L' 'key C' 'keyup Control_L'\" &")
+					#terminal("bash -c \"sleep 0.1 ; xte 'keydown Control_L' 'key C' 'keyup Control_L'\" &")
+					terminal("bash -c \"xte 'keydown Control_L' 'key C' 'keyup Control_L'\" &")
 
 					samples -=1
 				print('Waiting 3 minutes before starting next droprate test...')
