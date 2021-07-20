@@ -16,7 +16,7 @@ global closingApplication
 
 numSamples = 100
 zeroRoundTrip = False
-droprates = [0, 10, 40]
+droprates = [0, 5, 10, 20, 40]
 
 print()
 print('Number of samples', numSamples)
